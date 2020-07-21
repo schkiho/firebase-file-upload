@@ -5,7 +5,6 @@ import firebase from "./fbConfig";
 function App() {
   const [image, setImage] = useState(null);
   const [url, setUrl] = useState("");
-  const [progress, setProgress] = useState(0);
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -18,12 +17,13 @@ function App() {
     let file = image;
     let storageRef = firebase.storage().ref(`${bucketName}/${file.image.name}`);
     let uploadTask = storageRef.put(file.image);
-    console.log(uploadTask);
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        let progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setProgress({ progress });
+        let progress = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        console.log(progress);
       },
       (err) => {
         console.log(err.message);
@@ -34,10 +34,26 @@ function App() {
           .ref("images")
           .child(file.image.name)
           .getDownloadURL()
-          .then((url) => setUrl(url));
+          .then((url) => {
+            const flyer = {
+              name: file.image.name,
+              url: url,
+              added: new Date(),
+            };
+            firebase.firestore().collection("parties").add(flyer);
+          });
       }
     );
+    if (image && url) {
+      const db = firebase.firestore();
+      db.collection("parties").add({ name: image.image.name, url: url });
+    }
   };
+  if (image) {
+    console.log(image.image.name);
+  }
+
+  console.log(url);
 
   return (
     <div className="App">
@@ -54,8 +70,3 @@ function App() {
 }
 
 export default App;
-
-// uploadTask.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-//   console.log("File available at", downloadURL);
-//   console.log(typeof downloadURL);
-// });
