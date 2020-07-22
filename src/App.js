@@ -1,21 +1,25 @@
 import React, { useState } from "react";
 import "./App.css";
 import firebase from "./fbConfig";
+import Gallery from "./Gallery";
 
 function App() {
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
   const [image, setImage] = useState(null);
   const [url, setUrl] = useState("");
 
-  const handleChange = (e) => {
+  const handleFlyerChange = (e) => {
     e.preventDefault();
     const file = e.target.files[0];
     setImage({ image: file });
   };
 
-  const handleUpload = () => {
-    let bucketName = "images";
+  const handleFlyerUpload = () => {
+    let bucketName = "flyer";
     let file = image;
-    let storageRef = firebase.storage().ref(`${bucketName}/${file.image.name}`);
+    let storageRef = storage.ref(`${bucketName}/${file.image.name}`);
     let uploadTask = storageRef.put(file.image);
     uploadTask.on(
       "state_changed",
@@ -29,9 +33,8 @@ function App() {
         console.log(err.message);
       },
       () => {
-        firebase
-          .storage()
-          .ref("images")
+        storage
+          .ref(`${bucketName}`)
           .child(file.image.name)
           .getDownloadURL()
           .then((url) => {
@@ -40,31 +43,34 @@ function App() {
               url: url,
               added: new Date(),
             };
-            firebase.firestore().collection("parties").add(flyer);
+            db.collection("flyer").add(flyer);
+            setUrl(url);
           });
       }
     );
-    if (image && url) {
-      const db = firebase.firestore();
-      db.collection("parties").add({ name: image.image.name, url: url });
-    }
   };
-  if (image) {
-    console.log(image.image.name);
-  }
-
-  console.log(url);
 
   return (
     <div className="App">
       <h1>Upload</h1>
-      <div className="upload-container my-4">
-        <input type="file" onChange={handleChange} />
-        <button type="button" onClick={handleUpload}>
-          Submit
-        </button>
+      <div className="container">
+        <div className="row">
+          <div className="col">
+            <div className="flyer-upload my-4">
+              <input type="file" onChange={handleFlyerChange} />
+              <button type="button" onClick={handleFlyerUpload}>
+                Submit
+              </button>
+            </div>
+            <img
+              src={url}
+              alt="Hallo"
+              style={{ width: "300px", height: "200px" }}
+            />
+          </div>
+          <Gallery />
+        </div>
       </div>
-      <img src={url} alt="Hallo" style={{ width: "400px", height: "300px" }} />
     </div>
   );
 }
