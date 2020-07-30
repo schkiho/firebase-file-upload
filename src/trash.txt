@@ -1,0 +1,78 @@
+const album = {
+    name: galleryName,
+    images: [
+      {
+        name: "Testimage",
+        url: "TestURL",
+        added: new Date(),
+      },
+      {
+        name: "Testimage",
+        url: "TestURL",
+        added: new Date(),
+      },
+      {
+        name: "Testimage",
+        url: "TestURL",
+        added: new Date(),
+      },
+    ],
+    createdAt: new Date(),
+  };
+
+    let fileObj = [];
+  let fileArray = [];
+
+  const [images, setImages] = useState([null]);
+  const [galleryName, setGalleryName] = useState("");
+  const [progress, setProgress] = useState(0);
+
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  const handleGalleryName = (e) => {
+    e.preventDefault();
+    setGalleryName(e.target.value);
+  };
+
+  const handleSelectedImages = (e) => {
+    e.preventDefault();
+    fileObj.push(e.target.files);
+    for (let i = 0; i < fileObj[0].length; i++) {
+      fileArray.push(fileObj[0][i]);
+    }
+    setImages(fileArray);
+  };
+
+  const handleUpload = (e) => {
+    e.preventDefault();
+    for (let i = 0; i < images.length; i++) {
+      const task = storage
+        .ref(`${galleryName}/${images[i].name}`)
+        .put(images[i]);
+
+      task.on(
+        "state_changed",
+        (snapshot) => {
+          let progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setProgress(progress);
+        },
+        (error) => {
+          // error function ....
+          console.log(error);
+        },
+        () => {
+          storage
+            .ref(`${galleryName}`)
+            .child(images[i].name)
+            .getDownloadURL()
+            .then((url) => {
+              console.log(url);
+            });
+        }
+      );
+    }
+    db.collection("galleries").add(album);
+  };

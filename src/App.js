@@ -3,12 +3,13 @@ import "./App.css";
 import firebase from "./fbConfig";
 import Gallery from "./Gallery";
 
-function App() {
+const App = () => {
   const db = firebase.firestore();
   const storage = firebase.storage();
 
   const [image, setImage] = useState(null);
   const [url, setUrl] = useState("");
+  const [progress, setProgress] = useState(0);
 
   const handleFlyerChange = (e) => {
     e.preventDefault();
@@ -27,7 +28,7 @@ function App() {
         let progress = Math.round(
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
-        console.log(progress);
+        setProgress(progress);
       },
       (err) => {
         console.log(err.message);
@@ -52,27 +53,40 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Upload</h1>
       <div className="container">
         <div className="row">
-          <div className="col">
-            <div className="flyer-upload my-4">
-              <input type="file" onChange={handleFlyerChange} />
-              <button type="button" onClick={handleFlyerUpload}>
-                Submit
+          <div className="col-4">
+            <div className="my-4">
+              <progress value={progress} max="100" className="my-4" />
+              <br />
+              <input
+                type="file"
+                onChange={handleFlyerChange}
+                className="my-4"
+              />
+              <br />
+              <button
+                type="button"
+                onClick={handleFlyerUpload}
+                className="my-4"
+              >
+                Upload
               </button>
             </div>
             <img
-              src={url}
-              alt="Hallo"
+              src={url || "http://via.placeholder.com/300x200"}
+              alt="flyer"
               style={{ width: "300px", height: "200px" }}
+              className="my-4"
             />
           </div>
-          <Gallery />
+          <div className="col">
+            <Gallery />
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default App;
