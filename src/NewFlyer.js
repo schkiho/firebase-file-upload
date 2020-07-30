@@ -1,6 +1,5 @@
 import React, { Fragment, useState } from "react";
 import firebase from "./fbConfig";
-import fb from "firebase/app";
 
 const db = firebase.firestore();
 const storage = firebase.storage();
@@ -13,17 +12,15 @@ const NewPhoto = ({ currentAlbum }) => {
   };
 
   const onUpload = async () => {
-    const storageRef = storage.ref("albums");
+    const storageRef = storage.ref("flyer");
     const fileRef = storageRef.child(file.name);
     await fileRef.put(file);
-    db.collection("albums")
-      .doc(currentAlbum)
-      .update({
-        images: fb.firestore.FieldValue.arrayUnion({
-          name: file.name,
-          url: await fileRef.getDownloadURL(),
-        }),
-      });
+    const flyer = {
+      name: file.name,
+      url: await fileRef.getDownloadURL(),
+      added: new Date(),
+    };
+    db.collection("flyer").add(flyer);
   };
 
   return (

@@ -2,7 +2,6 @@ import React, { useState, Fragment } from "react";
 import firebase from "./fbConfig";
 
 const db = firebase.firestore();
-const storage = firebase.storage();
 
 const NewAlbumForm = () => {
   const [albumName, setAlbumName] = useState("");
