@@ -25,27 +25,27 @@ const Album = () => {
 
   return (
     <Fragment>
-      <section>
-        <header>
-          <h1>{albumName}</h1>
-          <p>
-            Go to the <Link to="/">Homepage</Link>{" "}
-          </p>
-        </header>
-        {images.map((image) => (
-          <aside key={image.name}>
-            <img
-              src={image.url}
-              alt="album"
-              style={{ width: "200px", height: "200px" }}
-            />
-            <h3>{image.name}</h3>
-          </aside>
-        ))}
-      </section>
-      <footer>
-        <NewPhoto currentAlbum={album} />
-      </footer>
+      <div className="container d-flex  justify-content-center">
+        <section>
+          <header className="text-center">
+            <h1>{albumName}</h1>
+            <p>
+              Go to the <Link to="/">Homepage</Link>{" "}
+            </p>
+          </header>
+          {images.map((image) => (
+            <aside key={image.name}>
+              <img
+                src={image.url}
+                alt="album"
+                style={{ width: "200px", height: "200px" }}
+              />
+              <h3>{image.name}</h3>
+            </aside>
+          ))}
+          <NewPhoto currentAlbum={album} />
+        </section>
+      </div>
     </Fragment>
   );
 };

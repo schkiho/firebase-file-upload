@@ -4,7 +4,7 @@ import firebase from "./fbConfig";
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-const NewPhoto = ({ currentAlbum }) => {
+const NewPhoto = () => {
   const [file, setFile] = useState(null);
 
   const onFileChange = (e) => {
